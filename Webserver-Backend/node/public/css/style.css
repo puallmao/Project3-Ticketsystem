@@ -1,3 +1,9 @@
 .ticketTable{
     max-height: 551px;
 }
+
+#alert-info{
+    margin: 0px;
+    margin-top: 20px;
+    width: 100%;
+}
