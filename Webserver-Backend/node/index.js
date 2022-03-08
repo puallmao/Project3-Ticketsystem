@@ -5,6 +5,7 @@ const http = require('http');
 const FormData = require('form-data');
 const multer = require('multer');
 const uuid = require('uuid').v4;
+const fs = require('fs');
 
 
 // VARIABLES
@@ -20,10 +21,11 @@ const databaseServerOptionsPOST = {
     }
 }
 const databaseServerOptionsGET = {
-  hostname: '127.0.0.1',
-  port: 8080,
+  hostname: '192.168.19.6',
+  port: 80,
   path: '/api/ticketsystem',
   method: 'GET',
+  keepAliveTimeout: 30000,
   headers: {
     'Content-Type': 'application/json'
   }
@@ -76,10 +78,17 @@ app.get('/ticketsystem', (req, res) =>{
 // SEND THE PRIVIOUSLY COLLECTED DATA TO THE DATABASE SERVER'S API
 app.post('/ticketsystem', upload.single('attachment'), (req, res) =>{
   var formData = new FormData(req.body);
+  var attachment;
+
+  try {
+    attachment = req.file.filename;
+  } catch { attachment = null; }
+
   var data = JSON.stringify(formData);
   data = JSON.parse(data);  
-  data.filename = attachmentFileName;
+  data.filename = attachment;
   console.log(data);
+  data = JSON.stringify(data);
   
   var postReq = http.request(databaseServerOptionsPOST, res => {
     console.log(`statusCode: ${res.statusCode}`);
@@ -88,11 +97,14 @@ app.post('/ticketsystem', upload.single('attachment'), (req, res) =>{
       process.stdout.write(d);
     });   
        
-    postReq.write(data);
-    postReq.end();
+   
   });
+ 
+  postReq.write(data);
+  postReq.end();
 
   postReq.on('error', function(err) {
+    fs.unlinkSync('./uploads' + attachment);
     console.log();
     console.log(err);
     console.log();
@@ -100,24 +112,26 @@ app.post('/ticketsystem', upload.single('attachment'), (req, res) =>{
   });    
 })
 
-app.get('/ticketsystem/tickets', (req, res) =>{
-  var getReq = http.request(databaseServerOptionsGET, res => {
+app.get('/ticketsystem/tickets', async(req, res) =>{
+   var data = JSON.stringify(req.body); 
+   var getReq = http.request(databaseServerOptionsGET, res => {
     console.log(`statusCode: ${res.statusCode}`);
 
     res.on('data', d => {
       process.stdout.write(d);
     });   
        
-    getReq.write(data);
-    getReq.end();
+    
   })
   
+  getReq.write(data);
+
   getReq.on('error', function(err) {
     console.log();
     console.log(err);
     console.log();
     res.sendStatus(500);
-  });  
+  });
 
-  res.send(getReq.body);
+  res.send(data);
 })
