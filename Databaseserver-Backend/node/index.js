@@ -28,19 +28,22 @@ const sqlSettings = {
 async function insertTicket(data, sqlConnection){
     try{
         let conn = await sqlConnection.getConnection();
-        let result = await conn.query(`INSERT INTO tickets (title, creator, date, description, category, status, attachment) VALUES ('${data.title}', '${data.creator}', '${data.date}', '${data.description}', '${data.category}', '${data.status}', '${data.attachment}')`);
+        let result = await conn.query(`INSERT INTO tickets (title, creator, date, description, category, status, filename) VALUES ('${data.title}', '${data.creator}', '${data.date}', '${data.description}', '${data.category}', '${data.status}', '${data.filename}')`);
         console.log(result);
+        conn.end();
     } catch{
         console.log('[ERROR]: Can`t insert ticket');
     }
 }
 
-async function getTickets(){
+async function getTickets(sqlConnection){
     try{
         let conn = await sqlConnection.getConnection();
-        let result = await conn.query(`SELECT * FROM tickets`);
+        let result = await conn.query('SELECT * FROM tickets');
+	console.log(result);
+        conn.end();
         return result;
-    } catch{
+    } catch {
         console.log('[ERROR]: Can`t get tickets');
         return null;
     }
@@ -51,7 +54,7 @@ async function getTickets(){
 app.use(express.json());
 
 
-// LISTEN ON PORT 8080
+// LISTEN ON PORT 80
 app.listen(
     PORT,
     () => console.log(`Listening on http://127.0.0.1:${PORT}`)
@@ -65,11 +68,21 @@ app.get('/', (req, res) =>{
 
 
 // SEND THE TICKET DATA TO THE WEBSERVER
-app.get('/api/ticketsystem', (req, res) =>{
-    var data = getTickets();
-    if (data != null){
-        res.send(data);
-        res.sendStatus(200);
+app.get('/api/ticketsystem', async(req, res) =>{
+    var sqlConnection = mariadb.createPool({
+	host: sqlSettings.host,
+	user: sqlSettings.user,
+	port: sqlSettings.port,
+	password: sqlSettings.password,
+	database: sqlSettings.database
+    });
+
+    var data = await getTickets(sqlConnection);   
+console.log(data)
+res.send({title: 'tet'});
+    if(data){
+	
+	
     } else {
         res.sendStatus(500);
     }
@@ -78,11 +91,12 @@ app.get('/api/ticketsystem', (req, res) =>{
 
 // HANDLE THE POST OF THE TICKET DATA
 app.post('/api/ticketsystem', (req, res) =>{
+   var data = req.body;
     console.log(data)  
 
     var sqlConnection = mariadb.createPool({
-        host: sqlSettings.host,
-        user: sqlSettings.user,
+	host: sqlSettings.host,
+	user: sqlSettings.user,
 	port: sqlSettings.port,
         password: sqlSettings.password,
         database: sqlSettings.database
@@ -91,3 +105,4 @@ app.post('/api/ticketsystem', (req, res) =>{
     insertTicket(data, sqlConnection);
     res.sendStatus(200)
 })
+
