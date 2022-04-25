@@ -23,8 +23,12 @@ All the necessary files for the Webserver are located in the Webserver-Backend f
 ### **Run the Webserver**
 *Execute in "./Webserver-Backend/node"*
 ```bash
-$   node index.js
+$   npm start
 ```
+
+### **Config**
+Use the additional Config-File. *".webserver-backend/node/config/local.toml"*   
+**Don't edit the *"default.toml"*!**
 
 <br>
 
@@ -36,10 +40,14 @@ All the necessary files for the Webserver are located in the Databaseserver-Back
 - The Database-API is listening on Port 80. Depending on the System you want to use, Firewall changes may be necessary.
 
 ### **Run the Database-API**
-*Execute in "./Databaseserver-Backend/node"*
+*Execute in "./databaseserver-backend/node"*
 ```bash
-$   node index.js
+$   npm start
 ```
+
+### **Config**
+Use the additional Config-File. *".databaseserver-backend/node/config/local.toml"*  
+**Don't edit the *"default.toml"*!**
 
 ### **Setup Database** 
 The Database-API ist build to use MariaDB. Make sure to install and configure it before using the API. 

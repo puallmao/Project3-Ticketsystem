@@ -1,5 +1,8 @@
 .ticketTable{
     max-height: 551px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 #alert-info{

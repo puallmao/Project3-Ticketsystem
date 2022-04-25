@@ -1,0 +1,9 @@
+[server]
+port = 80
+
+[sqlConnection]
+host = "127.0.0.1"
+port = 3306
+database = "projekt3"
+user = "root"
+password = "rootPG9"
