@@ -6,14 +6,16 @@ const FormData = require('form-data');
 const multer = require('multer');
 const uuid = require('uuid').v4;
 const fs = require('fs');
+const axios = require('axios');
+const config = require('config');
 
 
 // VARIABLES
 const app = express();
 const PORT = 80;
 const databaseServerOptionsPOST = {
-    hostname: '192.168.19.6',
-    port: 80,
+    hostname: config.get('databaseServer.host'),
+    port: config.get('databaseServer.port'),
     path: '/api/ticketsystem',
     method: 'POST',
     headers: {
@@ -21,19 +23,18 @@ const databaseServerOptionsPOST = {
     }
 }
 const databaseServerOptionsGET = {
-  hostname: '192.168.19.6',
-  port: 80,
+  hostname: config.get('databaseServer.host'),
+  port: config.get('databaseServer.port'),
   path: '/api/ticketsystem',
   method: 'GET',
-  keepAliveTimeout: 30000,
   headers: {
     'Content-Type': 'application/json'
   }
 }
-var attachmentFileName = "";
 
 
 // MULTER SETTINGS
+var attachmentFileName = "";
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
       cb(null, 'uploads')
@@ -75,7 +76,7 @@ app.get('/ticketsystem', (req, res) =>{
 
 
 // HANDLE THE POST OF THE TICKET DATA
-// SEND THE PRIVIOUSLY COLLECTED DATA TO THE DATABASE SERVER'S API
+// SEND THE PREVIOUSLY COLLECTED DATA TO THE DATABASE SERVER'S API
 app.post('/ticketsystem', upload.single('attachment'), (req, res) =>{
   var formData = new FormData(req.body);
   var attachment;
@@ -112,26 +113,17 @@ app.post('/ticketsystem', upload.single('attachment'), (req, res) =>{
   });    
 })
 
-app.get('/ticketsystem/tickets', async(req, res) =>{
-   var data = JSON.stringify(req.body); 
-   var getReq = http.request(databaseServerOptionsGET, res => {
-    console.log(`statusCode: ${res.statusCode}`);
 
-    res.on('data', d => {
-      process.stdout.write(d);
-    });   
-       
-    
+app.get('/ticketsystem/tickets', (req, res) =>{  
+  axios.get(`http://${databaseServerOptionsGET.hostname}/api/ticketsystem`).then(function (response) {
+    console.log(response);
+    res.send(response.data);
   })
-  
-  getReq.write(data);
-
-  getReq.on('error', function(err) {
-    console.log();
-    console.log(err);
-    console.log();
-    res.sendStatus(500);
-  });
-
-  res.send(data);
+  .catch(function (error){
+    if (error.response){
+      let {status,statusText} = error.response;
+      console.log(status,statusText);
+      res.sendStatus(500);
+    }
+  })
 })

@@ -17,8 +17,7 @@ function getTickets(){
   // ADD TICKETS TO THE TICKET LIST
   function addTicketToList(data){
     for(var key in data) {
-      for (var key1 in data[key]) {
-          var ticket = data[key][key1];
+          var ticket = data[key];
   
           var table = document.getElementById('ticketTable');
           var row = table.insertRow(0);
@@ -31,14 +30,23 @@ function getTickets(){
           var cell6 = row.insertCell(5);
           var cell7 = row.insertCell(6);
           
+	  var TicketDate = new Date(ticket.date);
+	  var day = TicketDate.getUTCDate();
+	  var month = TicketDate.getMonth() + 1;
+	  var year = TicketDate.getUTCFullYear();
+
+	  if(ticket.filename == 'null') {
+	      ticket.filename = '';
+	  }
+
           cell1.innerHTML = ticket.title;
           cell2.innerHTML = ticket.creator;
-          cell3.innerHTML = ticket.date;
+          cell3.innerHTML = `${day}.${month}.${year}`;
           cell4.innerHTML = ticket.description;
           cell5.innerHTML = ticket.category;
           cell6.innerHTML = ticket.status;
-          cell7.innerHTML = ticket.attachment;
-      }
+          cell7.innerHTML = ticket.filename;
+
    } 
   } 
   

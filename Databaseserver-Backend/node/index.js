@@ -1,26 +1,18 @@
 // REQUIRE
 const express = require('express')
 const mariadb = require('mariadb');
+const config = require('config');
 
 
 // VARIABLES
 const app = express();
-const PORT = 80;
-const webserverOptions = {
-    hostname: '192.168.242.4',
-    port: 80,
-    path: '/ticketsystem',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-}
+const PORT = config.get('server.port');
 const sqlSettings = {
-    host: "127.0.0.1",
-    user: "root",
-    port: 3306,
-    password: "rootPG9",
-    database: "projekt3"
+    host: config.get('sqlConnection.host'),
+    port: config.get('sqlConnection.port'),
+    database: config.get('sqlConnection.database'),
+    user: config.get('sqlConnection.user'),
+    password: config.get('sqlConnection.password')
 }
 
 
@@ -78,11 +70,10 @@ app.get('/api/ticketsystem', async(req, res) =>{
     });
 
     var data = await getTickets(sqlConnection);   
-console.log(data)
-res.send({title: 'tet'});
+    console.log(data)
+    
     if(data){
-	
-	
+        res.send(data);	
     } else {
         res.sendStatus(500);
     }
