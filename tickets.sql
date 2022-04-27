@@ -15,7 +15,8 @@ CREATE TABLE `tickets` (
   `date` date NOT NULL,
   `description` mediumtext NOT NULL,
   `catagory` char(255) NOT NULL,
-  `status` char(255) NOT NULL
+  `status` char(255) NOT NULL,
+  `filename` char (1024)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
