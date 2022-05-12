@@ -1,10 +1,15 @@
 // REQUIRE
 const express = require('express')
+const https = require('https')
 const mariadb = require('mariadb');
 const config = require('config');
-
+const fs = require('fs');
 
 // VARIABLES
+const options = {
+	key: fs.readFileSync(__dirname + config.get('server.key')),
+	cert: fs.readFileSync(__dirname + config.get('server.cert'))
+};
 const app = express();
 const PORT = config.get('server.port');
 const sqlSettings = {
@@ -46,21 +51,30 @@ async function getTickets(sqlConnection){
 app.use(express.json());
 
 
-// LISTEN ON PORT 80
-app.listen(
-    PORT,
-    () => console.log(`Listening on http://127.0.0.1:${PORT}`)
+// LISTEN
+//app.listen(
+//    PORT,
+//    () => console.log(`Listening on http://127.0.0.1:${PORT}`)
+//);
+
+const httpsServer = https.createServer(
+	options,
+	app
 );
 
+httpsServer.listen(PORT, () => {
+	console.log(`Listening on https://127.0.0.1:${PORT}`);
+});
 
 // REDIRECT TO TICKETSYSTEM API
 app.get('/', (req, res) =>{
     res.redirect('/api/ticketsytem')
-})
+});
 
 
 // SEND THE TICKET DATA TO THE WEBSERVER
 app.get('/api/ticketsystem', async(req, res) =>{
+	console.log('test');
     var sqlConnection = mariadb.createPool({
 	host: sqlSettings.host,
 	user: sqlSettings.user,

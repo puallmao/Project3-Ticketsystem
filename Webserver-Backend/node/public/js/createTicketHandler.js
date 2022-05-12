@@ -4,6 +4,41 @@ window.onload = function(){
   getTickets();
 }
 
+// // SEND THE TICKET DATA TO THE WEBSERVER
+// function submitTicket(){
+//   if (isTicketFormValid()){
+//     var xhr = new XMLHttpRequest();
+//     var url = "/ticketsystem";
+//     xhr.open("POST", url, true);
+//     xhr.setRequestHeader("Content-Type", "application/json");
+    
+//     xhr.onload  = function() {
+//       console.log (xhr.status);
+//       if (xhr.status >= 500){
+//         displayNotification("error")
+//       } else if (xhr.status >= 300 && xhr.status <= 400){
+//         displayNotification("warning");
+//       } else if (xhr.status < 300){
+//         displayNotification("success");
+//       }
+//       return;
+//     };
+
+//     var data = JSON.stringify({"title": document.getElementById('ticket-title').value,
+//                               "creator": document.getElementById('ticket-creator').value,
+//                               "date": document.getElementById('ticket-date').value,
+//                               "description": document.getElementById('ticket-description').value,
+//                               "category": document.getElementById('ticket-category').value,
+//                               "status": document.getElementById('ticket-status').value 
+//                               });
+       
+//     xhr.send(data);
+//   }
+//   else {
+//     displayNotification("error");
+//   }
+// }
+
 // SEND THE TICKET DATA TO THE WEBSERVER
 function submitTicket(){
   if (isTicketFormValid()){
@@ -35,6 +70,7 @@ function submitTicket(){
     console.log(data);
        
     xhr.send(data);
+    clearTicketCreation();
   }
   else {
     displayNotification("error");
